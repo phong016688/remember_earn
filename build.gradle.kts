@@ -2,5 +2,8 @@
 plugins {
     alias(libs.plugins.android.application) apply false
     alias(libs.plugins.jetbrains.kotlin.android) apply false
-    id("org.jlleitschuh.gradle.ktlint") version "12.1.1" apply false
+    alias(libs.plugins.ktlint) apply false
+    alias(libs.plugins.hilt.project.plugin) apply false
+    alias(libs.plugins.devtools.ksp) apply false
+    alias(libs.plugins.androidx.room) apply false
 }

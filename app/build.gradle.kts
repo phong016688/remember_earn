@@ -3,7 +3,11 @@ import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
-    id("org.jlleitschuh.gradle.ktlint")
+    alias(libs.plugins.ktlint)
+    alias(libs.plugins.hilt.plugin)
+    alias(libs.plugins.devtools.ksp)
+    alias(libs.plugins.androidx.room)
+    id("kotlin-parcelize")
 }
 
 configure<org.jlleitschuh.gradle.ktlint.KtlintExtension> {
@@ -20,7 +24,6 @@ configure<org.jlleitschuh.gradle.ktlint.KtlintExtension> {
             "max_line_length" to "20"
         )
     )
-    disabledRules.set(setOf("final-newline")) // not supported with ktlint 0.48+
     baseline.set(file("ktlint-baseline.xml"))
     reporters {
         reporter(ReporterType.PLAIN)
@@ -32,6 +35,10 @@ configure<org.jlleitschuh.gradle.ktlint.KtlintExtension> {
     filter {
         exclude("**/generated/**")
         include("**/kotlin/**")
+    }
+
+    room {
+        schemaDirectory("$projectDir/schemas")
     }
 }
 
@@ -72,7 +79,7 @@ android {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.1"
+        kotlinCompilerExtensionVersion = "1.5.10"
     }
     packaging {
         resources {
@@ -98,4 +105,58 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+
+    // Coroutines
+    implementation(libs.kotlinx.coroutines.core)
+    implementation(libs.kotlinx.coroutines.android)
+
+    // Hilt
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.android.compiler)
+    implementation(libs.androidx.hilt.navigation.compose)
+    ksp(libs.androidx.hilt.compiler)
+
+    // Retrofit
+    implementation(libs.retrofit)
+    implementation(libs.converter.moshi)
+    implementation(libs.retrofit2.kotlinx.serialization.converter)
+
+    // OkhttpClient
+    implementation(libs.okhttp)
+    implementation(libs.logging.interceptor)
+
+    // Joda time
+    implementation(libs.android.joda)
+
+    // Permission
+    implementation(libs.permissionx)
+
+    // Firebase
+    implementation(platform(libs.firebase.bom))
+
+    // Gson
+    implementation(libs.gson)
+    implementation(libs.converter.gson)
+
+    // System UI
+    implementation(libs.accompanist.systemuicontroller)
+
+    // Navigation, using this version without animation when navigate
+    implementation(libs.androidx.navigation.compose)
+
+    // Lifecycle-viewmodel
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)
+    implementation(libs.androidx.lifecycle.viewmodel.savedstate)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+
+    // Eventbus
+    implementation(libs.eventbus)
+
+    // Room
+    implementation(libs.androidx.room.runtime)
+    ksp(libs.androidx.room.compiler)
+    implementation(libs.androidx.room.ktx)
+
+    // Glide
+    implementation(libs.compose)
 }
