@@ -1,4 +1,4 @@
-package com.haohao.rememberearn.ui.theme
+package com.haohao.rememberearn.presentation.ui.theme
 
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
