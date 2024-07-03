@@ -1,4 +1,4 @@
-package com.haohao.rememberearn
+package com.haohao.rememberearn.application
 
 import android.app.Application
 import android.content.Context
@@ -8,10 +8,9 @@ import java.lang.ref.WeakReference
 var application: WeakReference<RememberEarnApplication> = WeakReference(null)
 
 @HiltAndroidApp
-class RememberEarnApplication : Application() {
+class RememberEarnApplication: Application() {
     private val TAG = "RememberEarnApplication"
-
-
+    
     override fun onCreate() {
         super.onCreate()
         application = WeakReference(this)

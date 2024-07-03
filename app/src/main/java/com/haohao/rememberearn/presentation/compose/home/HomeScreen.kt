@@ -16,10 +16,8 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -29,36 +27,38 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.google.accompanist.systemuicontroller.SystemUiController
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.haohao.rememberearn.R
-import com.haohao.rememberearn.presentation.ui.states.MessageState
 import com.haohao.rememberearn.presentation.ui.states.MessageType
-import com.haohao.rememberearn.presentation.ui.states.ProgressState
-import com.haohao.rememberearn.presentation.viewmodels.HomeViewModel
 import kotlinx.coroutines.delay
 
 @Composable
-fun WorkoutScreen(vm: HomeViewModel = hiltViewModel()) {
-    val candleState by vm.candleState.collectAsState()
-    val systemUiController: SystemUiController = rememberSystemUiController()
+internal fun HomeRoute(
+    modifier: Modifier = Modifier,
+    viewModel: HomeViewModel = hiltViewModel(),
+) {
+    val uiState by viewModel.candleState.collectAsStateWithLifecycle()
+    HomeScreen(
+        uiState = uiState,
+        onCalc = viewModel::calcData,
+        modifier = modifier,
+    )
+}
 
-    LaunchedEffect(Unit) {
-        vm.fetchData()
-        systemUiController.setStatusBarColor(color = Color(0xFFDA7656))
-    }
-
+@Composable
+fun HomeScreen(
+    uiState: HomeState,
+    onCalc: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     Column(
-        Modifier
-            .fillMaxSize()
-            .background(Color.White),
+        modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         var text by remember { mutableStateOf("") }
@@ -69,6 +69,7 @@ fun WorkoutScreen(vm: HomeViewModel = hiltViewModel()) {
             fontSize = TextUnit(20f, TextUnitType.Sp),
             fontWeight = FontWeight.Bold
         )
+
         OutlinedTextField(
             modifier = Modifier.padding(top = 32.dp),
             value = text,
@@ -87,28 +88,12 @@ fun WorkoutScreen(vm: HomeViewModel = hiltViewModel()) {
             modifier = Modifier
                 .padding(top = 24.dp)
                 .size(200.dp, 50.dp),
-            onClick = { vm.fetchData() }) {
+            onClick = { onCalc.invoke() }) {
             Text(
                 text = "Get result",
                 color = Color.Black,
                 fontSize = TextUnit(18f, TextUnitType.Sp)
             )
-        }
-    }
-
-    vm.apply {
-        val uiState by uiState.collectAsState()
-        when (uiState.progressState) {
-            ProgressState.Loading -> ShowProgressDialog()
-            else -> {}
-        }
-        if (uiState.messageState.msg.isNotEmpty()) {
-            CustomToast(
-                message = uiState.messageState.msg,
-                messageType = uiState.messageState.type
-            ) {
-                vm.updateMessageState(MessageState())
-            }
         }
     }
 }
